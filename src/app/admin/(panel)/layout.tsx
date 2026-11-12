@@ -8,9 +8,9 @@ const ENLACES = [
   { href: "/admin/respuestas", texto: "Respuestas" },
   { href: "/admin/seguimiento", texto: "Seguimiento" },
   { href: "/admin/ligas", texto: "Ligas mayoreo" },
+  { href: "/admin/sucursales", texto: "Sucursales y QR" },
 ];
 const ENLACES_ADMIN = [
-  { href: "/admin/sucursales", texto: "Sucursales" },
   { href: "/admin/usuarios", texto: "Usuarios" },
 ];
 
@@ -56,7 +56,7 @@ export default async function LayoutPanel({ children }: { children: ReactNode })
             <form action={cerrarSesion}>
               <button
                 type="submit"
-                className="rounded-lg border border-white/20 px-3 py-1 text-xs font-semibold text-white/80 hover:bg-white/10 hover:text-white transition"
+                className="rounded-lg border border-white/20 px-3 py-1 text-xs font-semibold text-white/80 hover:bg-white/10 hover:text-white transition cursor-pointer"
               >
                 Salir
               </button>
