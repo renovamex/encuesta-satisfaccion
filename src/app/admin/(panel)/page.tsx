@@ -5,7 +5,7 @@ import { leerFiltros, rangoFechas } from "@/lib/filtros";
 import { formatearNumero } from "@/lib/formato";
 import { FiltrosForm } from "@/components/admin/filtros-form";
 
-export const metadata = { title: "Renova | Dashboard" };
+export const metadata = { title: "Renova | Dashboard de Satisfacción" };
 
 type Metricas = {
   total: number;
@@ -24,11 +24,33 @@ type Resumen = {
 
 const NOMBRE_CANAL = { tienda: "Tienda", mayoreo: "Mayoreo / sobre pedido" } as const;
 
-function Tarjeta({ titulo, valor, nota }: { titulo: string; valor: string; nota?: string }) {
+function Tarjeta({
+  titulo,
+  valor,
+  nota,
+  destacado,
+  alerta,
+}: {
+  titulo: string;
+  valor: string;
+  nota?: string;
+  destacado?: boolean;
+  alerta?: boolean;
+}) {
   return (
-    <div className="rounded-2xl border border-borde bg-tarjeta p-5 shadow-sm">
-      <p className="text-sm text-suave">{titulo}</p>
-      <p className="mt-1 text-3xl font-semibold text-marca">{valor}</p>
+    <div
+      className={`rounded-2xl border p-5 shadow-[0_8px_24px_rgba(32,32,32,0.06)] transition ${
+        alerta
+          ? "border-red-300 bg-red-50/50 hover:bg-red-50"
+          : destacado
+          ? "border-acento-dorado bg-gradient-to-br from-white to-amber-50/40"
+          : "border-borde bg-tarjeta"
+      }`}
+    >
+      <p className="text-xs font-bold uppercase tracking-wider text-suave">{titulo}</p>
+      <p className={`mt-1.5 text-3xl font-extrabold font-heading ${alerta ? "text-red-700" : "text-marca"}`}>
+        {valor}
+      </p>
       {nota ? <p className="mt-1 text-xs text-suave">{nota}</p> : null}
     </div>
   );
@@ -42,28 +64,42 @@ function TablaMetricas({
   filas: { clave: string; nombre: string; m: Metricas }[];
 }) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-borde bg-tarjeta shadow-sm">
-      <h2 className="px-5 pt-4 font-semibold text-marca">{titulo}</h2>
-      <table className="mt-2 w-full text-left text-sm">
-        <thead className="border-b border-borde text-suave">
+    <div className="overflow-x-auto rounded-2xl border border-borde bg-tarjeta shadow-[0_8px_24px_rgba(32,32,32,0.06)]">
+      <div className="border-b border-borde px-5 py-4">
+        <h2 className="font-extrabold text-marca font-heading text-lg">{titulo}</h2>
+      </div>
+      <table className="w-full text-left text-sm">
+        <thead className="border-b border-borde bg-slate-50/60 text-xs font-bold uppercase tracking-wider text-suave">
           <tr>
-            <th className="px-5 py-2 font-medium">&nbsp;</th>
-            <th className="px-3 py-2 font-medium">Resp.</th>
-            <th className="px-3 py-2 font-medium">Satisf.</th>
-            <th className="px-3 py-2 font-medium">Atención</th>
-            <th className="px-3 py-2 font-medium">Prod./Entrega</th>
-            <th className="px-3 py-2 font-medium">NPS</th>
+            <th className="px-5 py-3">&nbsp;</th>
+            <th className="px-3 py-3">Respuestas</th>
+            <th className="px-3 py-3">Satisfacción</th>
+            <th className="px-3 py-3">Atención</th>
+            <th className="px-3 py-3">Producto / Entrega</th>
+            <th className="px-3 py-3">NPS</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-borde">
           {filas.map(({ clave, nombre, m }) => (
-            <tr key={clave} className="border-b border-borde last:border-0">
-              <td className="px-5 py-2.5 font-medium">{nombre}</td>
-              <td className="px-3 py-2.5">{m.total}</td>
-              <td className="px-3 py-2.5">{formatearNumero(m.satisfaccion)}</td>
-              <td className="px-3 py-2.5">{formatearNumero(m.atencion)}</td>
-              <td className="px-3 py-2.5">{formatearNumero(m.producto_entrega)}</td>
-              <td className="px-3 py-2.5">{formatearNumero(m.nps, 0)}</td>
+            <tr key={clave} className="hover:bg-slate-50/50 transition">
+              <td className="px-5 py-3.5 font-bold text-marca">{nombre}</td>
+              <td className="px-3 py-3.5 font-semibold">{m.total}</td>
+              <td className="px-3 py-3.5 font-medium">{formatearNumero(m.satisfaccion)} ★</td>
+              <td className="px-3 py-3.5 font-medium">{formatearNumero(m.atencion)} ★</td>
+              <td className="px-3 py-3.5 font-medium">{formatearNumero(m.producto_entrega)} ★</td>
+              <td className="px-3 py-3.5">
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
+                    (m.nps ?? 0) >= 50
+                      ? "bg-emerald-100 text-emerald-800"
+                      : (m.nps ?? 0) >= 0
+                      ? "bg-amber-100 text-amber-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {formatearNumero(m.nps, 0)}
+                </span>
+              </td>
             </tr>
           ))}
           {filas.length === 0 ? (
@@ -81,22 +117,30 @@ function TablaMetricas({
 
 function Tendencia({ datos }: { datos: Resumen["tendencia"] }) {
   if (datos.length === 0) return null;
-  const maximo = Math.max(...datos.map((d) => d.total));
+  const maximo = Math.max(...datos.map((d) => d.total), 1);
   return (
-    <div className="rounded-2xl border border-borde bg-tarjeta p-5 shadow-sm">
-      <h2 className="font-semibold text-marca">Respuestas por día</h2>
-      <p className="text-xs text-suave">Altura = número de respuestas. Pasa el cursor para ver la satisfacción del día.</p>
-      <div className="mt-4 flex h-40 items-end gap-1 overflow-x-auto" role="img" aria-label="Respuestas por día">
+    <div className="rounded-2xl border border-borde bg-tarjeta p-6 shadow-[0_8px_24px_rgba(32,32,32,0.06)]">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-extrabold text-marca font-heading text-lg">Tendencia de respuestas por día</h2>
+          <p className="text-xs text-suave mt-0.5">
+            Altura de barra = volumen de respuestas. Pasa el cursor para consultar calificación promedio.
+          </p>
+        </div>
+      </div>
+      <div className="mt-6 flex h-44 items-end gap-2 overflow-x-auto pt-4" role="img" aria-label="Respuestas por día">
         {datos.map((d) => (
           <div
             key={d.dia}
-            title={`${d.dia}: ${d.total} respuestas, satisfacción ${formatearNumero(d.satisfaccion)}`}
-            className="min-w-3 flex-1 rounded-t bg-acento/80 hover:bg-acento"
-            style={{ height: `${Math.max(4, (d.total / maximo) * 100)}%` }}
-          />
+            title={`${d.dia}: ${d.total} respuestas, satisfacción promedio ${formatearNumero(d.satisfaccion)}/5`}
+            className="group relative min-w-8 flex-1 rounded-t-lg bg-acento hover:bg-acento-dorado transition-all cursor-pointer flex flex-col justify-end items-center"
+            style={{ height: `${Math.max(12, (d.total / maximo) * 100)}%` }}
+          >
+            <span className="mb-1 text-[11px] font-extrabold text-marca opacity-90">{d.total}</span>
+          </div>
         ))}
       </div>
-      <div className="mt-1 flex justify-between text-[11px] text-suave">
+      <div className="mt-2 flex justify-between text-xs font-semibold text-suave border-t border-borde pt-2">
         <span>{datos[0].dia}</span>
         <span>{datos[datos.length - 1].dia}</span>
       </div>
@@ -122,8 +166,14 @@ export default async function Dashboard({ searchParams }: PageProps<"/admin">) {
   const r = data as Resumen | null;
 
   return (
-    <div className="space-y-5">
-      <h1 className="text-2xl font-semibold text-marca">Dashboard</h1>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-marca font-heading tracking-tight">Dashboard General</h1>
+          <p className="text-sm text-suave">Resumen de satisfacción, calidad de servicio y NPS en sucursales Renova</p>
+        </div>
+      </div>
+
       <FiltrosForm accion="/admin" filtros={filtros} sucursales={sucursales ?? []} />
 
       {error || !r ? (
@@ -133,26 +183,41 @@ export default async function Dashboard({ searchParams }: PageProps<"/admin">) {
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            <Tarjeta titulo="Respuestas" valor={String(r.general.total)} />
-            <Tarjeta titulo="Satisfacción general" valor={formatearNumero(r.general.satisfaccion)} nota="Promedio de 1 a 5" />
-            <Tarjeta titulo="NPS" valor={formatearNumero(r.general.nps, 0)} nota="De -100 a 100" />
-            <Tarjeta titulo="Atención" valor={formatearNumero(r.general.atencion)} nota="Promedio de 1 a 5" />
-            <Link href="/admin/seguimiento" className="block">
+            <Tarjeta titulo="Total Respuestas" valor={String(r.general.total)} nota="Muestra acumulada" />
+            <Tarjeta
+              titulo="Satisfacción General"
+              valor={`${formatearNumero(r.general.satisfaccion)} / 5`}
+              nota="Escala CSAT (1 a 5)"
+              destacado
+            />
+            <Tarjeta
+              titulo="Net Promoter Score"
+              valor={formatearNumero(r.general.nps, 0)}
+              nota="Índice NPS (-100 a +100)"
+              destacado
+            />
+            <Tarjeta
+              titulo="Atención de Asesor"
+              valor={`${formatearNumero(r.general.atencion)} / 5`}
+              nota="Evaluación de trato"
+            />
+            <Link href="/admin/seguimiento" className="block group">
               <Tarjeta
-                titulo="Seguimientos pendientes"
+                titulo="Casos por Atender"
                 valor={String(r.seguimientos_pendientes)}
-                nota="Calificaciones bajas por atender"
+                nota="Detractores (CSAT ≤ 2 o NPS ≤ 6)"
+                alerta={r.seguimientos_pendientes > 0}
               />
             </Link>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-5 lg:grid-cols-2">
             <TablaMetricas
-              titulo="Tienda vs. mayoreo"
+              titulo="Desglose por canal (Tienda vs. Mayoreo)"
               filas={r.por_canal.map((c) => ({ clave: c.canal, nombre: NOMBRE_CANAL[c.canal], m: c }))}
             />
             <TablaMetricas
-              titulo="Por sucursal"
+              titulo="Desglose por sucursal física"
               filas={r.por_sucursal.map((s) => ({ clave: s.sucursal_id ?? "sin", nombre: s.nombre, m: s }))}
             />
           </div>

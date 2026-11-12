@@ -42,7 +42,7 @@ export function FormularioEncuesta({ accion, pedirNumeroPedido, redirigirAGoogle
         {urlResena ? (
           <a
             href={urlResena}
-            className="mt-5 inline-block rounded-xl bg-acento px-5 py-3 font-semibold text-white"
+            className="mt-6 inline-flex items-center justify-center rounded-xl bg-acento px-6 py-3.5 text-base font-extrabold text-sobre-acento shadow-sm hover:bg-acento-dorado transition"
           >
             Dejar reseña en Google
           </a>
@@ -99,11 +99,11 @@ export function FormularioEncuesta({ accion, pedirNumeroPedido, redirigirAGoogle
       </div>
 
       {pedirNumeroPedido ? (
-        <div className="rounded-2xl border border-borde bg-tarjeta p-5 shadow-sm">
-          <label htmlFor="numero_pedido" className="block font-medium text-marca">
+        <div className="rounded-2xl border border-borde bg-tarjeta p-5 shadow-[0_8px_24px_rgba(32,32,32,0.06)]">
+          <label htmlFor="numero_pedido" className="block font-bold text-marca text-base font-heading">
             Número de pedido
           </label>
-          <p className="mt-1 text-sm text-suave">Tu asesor te lo proporciona en el mostrador.</p>
+          <p className="mt-1 text-sm text-suave">Tu asesor te lo proporciona en el mostrador o nota de venta.</p>
           <input
             id="numero_pedido"
             name="numero_pedido"
@@ -114,10 +114,11 @@ export function FormularioEncuesta({ accion, pedirNumeroPedido, redirigirAGoogle
             maxLength={40}
             required
             aria-invalid={Boolean(errores.numero_pedido)}
-            className="mt-3 w-full rounded-xl border border-borde px-4 py-3 text-lg uppercase outline-none focus:border-acento focus:ring-2 focus:ring-acento/30"
+            placeholder="EJ. ATZ-1234"
+            className="mt-3 w-full rounded-xl border border-borde bg-white px-4 py-3 text-lg font-bold uppercase text-marca outline-none transition focus:border-acento-dorado focus:ring-2 focus:ring-acento/40"
           />
           {errores.numero_pedido ? (
-            <p role="alert" className="mt-2 text-sm text-red-600">
+            <p role="alert" className="mt-2 text-sm font-semibold text-red-600">
               {errores.numero_pedido}
             </p>
           ) : null}
@@ -125,55 +126,56 @@ export function FormularioEncuesta({ accion, pedirNumeroPedido, redirigirAGoogle
       ) : null}
 
       {PREGUNTAS_ESCALA.map(({ campo, texto }) => (
-        <fieldset key={campo} className="rounded-2xl border border-borde bg-tarjeta p-5 shadow-sm">
-          <legend className="px-1 font-medium text-marca">{texto}</legend>
+        <fieldset key={campo} className="rounded-2xl border border-borde bg-tarjeta p-5 shadow-[0_8px_24px_rgba(32,32,32,0.06)]">
+          <legend className="px-1 font-bold text-marca text-base font-heading">{texto}</legend>
           <div className="mt-3 grid grid-cols-5 gap-2">
             {ETIQUETAS_ESCALA.map((etiqueta, i) => (
               <label key={etiqueta} className="cursor-pointer text-center">
                 <input type="radio" name={campo} value={i + 1} className="peer sr-only" required />
-                <span className="flex h-12 items-center justify-center rounded-xl border border-borde text-lg font-semibold text-marca transition peer-checked:border-acento peer-checked:bg-acento peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-acento/50">
+                <span className="flex h-12 items-center justify-center rounded-xl border border-borde bg-white text-lg font-bold text-marca transition peer-checked:border-acento-dorado peer-checked:bg-acento peer-checked:text-sobre-acento peer-focus-visible:ring-2 peer-focus-visible:ring-foco hover:border-acento-dorado/60">
                   {i + 1}
                 </span>
-                <span className="mt-1 block text-[11px] leading-tight text-suave">{etiqueta}</span>
+                <span className="mt-1 block text-[11px] font-medium leading-tight text-suave">{etiqueta}</span>
               </label>
             ))}
           </div>
         </fieldset>
       ))}
 
-      <fieldset className="rounded-2xl border border-borde bg-tarjeta p-5 shadow-sm">
-        <legend className="px-1 font-medium text-marca">{PREGUNTA_NPS}</legend>
+      <fieldset className="rounded-2xl border border-borde bg-tarjeta p-5 shadow-[0_8px_24px_rgba(32,32,32,0.06)]">
+        <legend className="px-1 font-bold text-marca text-base font-heading">{PREGUNTA_NPS}</legend>
         <div className="mt-3 grid grid-cols-6 gap-2 sm:grid-cols-11">
           {Array.from({ length: 11 }, (_, n) => (
             <label key={n} className="cursor-pointer">
               <input type="radio" name="nps" value={n} className="peer sr-only" required />
-              <span className="flex h-11 items-center justify-center rounded-xl border border-borde font-semibold text-marca transition peer-checked:border-acento peer-checked:bg-acento peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-acento/50">
+              <span className="flex h-11 items-center justify-center rounded-xl border border-borde bg-white font-bold text-marca transition peer-checked:border-acento-dorado peer-checked:bg-acento peer-checked:text-sobre-acento peer-focus-visible:ring-2 peer-focus-visible:ring-foco hover:border-acento-dorado/60">
                 {n}
               </span>
             </label>
           ))}
         </div>
-        <div className="mt-2 flex justify-between text-[11px] text-suave">
-          <span>Nada probable</span>
-          <span>Muy probable</span>
+        <div className="mt-2 flex justify-between text-[11px] font-semibold text-suave px-1">
+          <span>0 = Nada probable</span>
+          <span>10 = Muy probable</span>
         </div>
       </fieldset>
 
-      <div className="rounded-2xl border border-borde bg-tarjeta p-5 shadow-sm">
-        <label htmlFor="comentario" className="block font-medium text-marca">
-          ¿Algo más que quieras contarnos? <span className="font-normal text-suave">(opcional)</span>
+      <div className="rounded-2xl border border-borde bg-tarjeta p-5 shadow-[0_8px_24px_rgba(32,32,32,0.06)]">
+        <label htmlFor="comentario" className="block font-bold text-marca text-base font-heading">
+          ¿Algo más que quieras contarnos? <span className="font-normal text-sm text-suave">(opcional)</span>
         </label>
         <textarea
           id="comentario"
           name="comentario"
-          rows={4}
+          rows={3}
           maxLength={2000}
-          className="mt-3 w-full rounded-xl border border-borde px-4 py-3 outline-none focus:border-acento focus:ring-2 focus:ring-acento/30"
+          placeholder="Cuéntanos qué te pareció el servicio, los materiales o la entrega..."
+          className="mt-3 w-full rounded-xl border border-borde bg-white px-4 py-3 text-sm text-marca outline-none transition focus:border-acento-dorado focus:ring-2 focus:ring-acento/40"
         />
       </div>
 
       {errores.general ? (
-        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
           {errores.general}
         </p>
       ) : null}
@@ -181,9 +183,9 @@ export function FormularioEncuesta({ accion, pedirNumeroPedido, redirigirAGoogle
       <button
         type="submit"
         disabled={pendiente}
-        className="w-full rounded-xl bg-acento px-5 py-4 text-lg font-semibold text-white shadow-sm transition disabled:opacity-60"
+        className="w-full rounded-xl bg-acento px-5 py-4 text-lg font-extrabold text-sobre-acento shadow-sm hover:bg-acento-dorado transition disabled:opacity-60 min-h-[48px] active:scale-[0.99] cursor-pointer"
       >
-        {pendiente ? "Enviando…" : "Enviar respuestas"}
+        {pendiente ? "Enviando respuesta…" : "Enviar encuesta"}
       </button>
     </form>
   );
