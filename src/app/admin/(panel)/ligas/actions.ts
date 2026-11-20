@@ -9,6 +9,7 @@ export type EstadoCrearLiga = {
   error?: string;
   token?: string;
   numeroPedido?: string;
+  referenciaCliente?: string;
 };
 
 /** Vacío → null; si no, número entre 0 y 99,999,999 (acepta "$1,234.50"). */
@@ -41,7 +42,7 @@ export async function crearLiga(_prev: EstadoCrearLiga, formData: FormData): Pro
       monto_ticket: monto.monto,
       creada_por: perfil.id,
     })
-    .select("token, numero_pedido")
+    .select("token, numero_pedido, referencia_cliente")
     .single();
 
   if (error) {
@@ -49,18 +50,20 @@ export async function crearLiga(_prev: EstadoCrearLiga, formData: FormData): Pro
     if (error.code === "23505") {
       return { error: "Ya existe una liga activa para ese pedido. Anúlala primero si necesitas generar otra." };
     }
-    console.error("crearLiga", error);
-    return { error: "No pudimos crear la liga. Inténtalo de nuevo." };
+    return { error: "No se pudo crear la liga. Inténtalo de nuevo." };
   }
 
   revalidatePath("/admin/ligas");
-  return { token: data.token, numeroPedido: data.numero_pedido };
+  return {
+    token: data.token,
+    numeroPedido: data.numero_pedido,
+    referenciaCliente: data.referencia_cliente ?? undefined,
+  };
 }
 
 export async function anularLiga(id: string) {
   await requerirPerfil();
   const supabase = await supabaseServer();
-  // Solo se anulan ligas aún no respondidas.
   await supabase
     .from("invitaciones_mayoreo")
     .update({ estado: "anulada" })
