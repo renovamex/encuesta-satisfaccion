@@ -14,7 +14,8 @@ export const PLANTILLAS_WHATSAPP = [
     descripcion: "Para la mayoría de pedidos de sobre pedido o mayoreo.",
     generar: (url: string, pedido: string, ref: string) => {
       const saludo = ref ? `Hola ${ref},` : "Hola,";
-      return `${saludo} te saludamos de Renova.\n\nConfirmamos la entrega de tu pedido ${pedido}. En Renova queremos asegurarnos de que todo haya llegado en orden y a tiempo para tu proyecto.\n\n¿Nos ayudas con una breve evaluación de 1 minuto sobre tu experiencia?\n👉 ${url}\n\nMuchas gracias por tu confianza. Tu proyecto no se detiene.`;
+      const ped = pedido ? ` ${pedido}` : "";
+      return `${saludo} te saludamos de Renova.\n\nConfirmamos la entrega de tu pedido${ped}. En Renova queremos asegurarnos de que todo haya llegado en orden y a tiempo para tu proyecto.\n\n¿Nos ayudas con una breve evaluación de 1 minuto sobre tu experiencia?\n👉 ${url}\n\nMuchas gracias por tu confianza. Tu proyecto no se detiene.`;
     },
   },
   {
@@ -23,7 +24,8 @@ export const PLANTILLAS_WHATSAPP = [
     descripcion: "Enfocado en tiempos de entrega, stock y avance de obra.",
     generar: (url: string, pedido: string, ref: string) => {
       const saludo = ref ? `Hola ${ref}, qué tal.` : "Hola, qué tal.";
-      return `${saludo} Te saludamos de Renova.\n\nLe dimos seguimiento al despacho de tu pedido ${pedido}. Nuestro compromiso es que tu obra no se detenga y que cuentes con el material a tiempo.\n\nTe comparto esta liga rápida (toma menos de 1 minuto) para calificar la entrega y la atención:\n👉 ${url}\n\nNos ayuda mucho a darte el mejor servicio en tus siguientes compras. Saludos.`;
+      const ped = pedido ? ` ${pedido}` : "";
+      return `${saludo} Te saludamos de Renova.\n\nLe dimos seguimiento al despacho de tu pedido${ped}. Nuestro compromiso es que tu obra no se detenga y que cuentes con el material a tiempo.\n\nTe comparto esta liga rápida (toma menos de 1 minuto) para calificar la entrega y la atención:\n👉 ${url}\n\nNos ayuda mucho a darte el mejor servicio en tus siguientes compras. Saludos.`;
     },
   },
   {
@@ -32,7 +34,8 @@ export const PLANTILLAS_WHATSAPP = [
     descripcion: "Tono profesional enfocado en especificaciones y cumplimiento.",
     generar: (url: string, pedido: string, ref: string) => {
       const saludo = ref ? `Estimado/a ${ref}, gusto en saludarte.` : "Gusto en saludarte.";
-      return `${saludo} Te escribimos del equipo de Renova.\n\nDando seguimiento al pedido ${pedido} para tu proyecto, esperamos que los acabados y materiales hayan cumplido con todas tus especificaciones.\n\nNos ayudarías mucho respondiendo esta breve encuesta de satisfacción sobre la atención y el tiempo de entrega:\n👉 ${url}\n\nGracias por confiar en nosotros para tus proyectos. Quedamos a tus órdenes.`;
+      const ped = pedido ? ` ${pedido}` : "";
+      return `${saludo} Te escribimos del equipo de Renova.\n\nDando seguimiento al pedido${ped} para tu proyecto, esperamos que los acabados y materiales hayan cumplido con todas tus especificaciones.\n\nNos ayudarías mucho respondiendo esta breve encuesta de satisfacción sobre la atención y el tiempo de entrega:\n👉 ${url}\n\nGracias por confiar en nosotros para tus proyectos. Quedamos a tus órdenes.`;
     },
   },
   {
@@ -41,19 +44,65 @@ export const PLANTILLAS_WHATSAPP = [
     descripcion: "Cálido y enfocado en la remodelación del hogar.",
     generar: (url: string, pedido: string, ref: string) => {
       const saludo = ref ? `Hola ${ref},` : "Hola,";
-      return `${saludo} te saludamos de Renova.\n\nEsperamos que los materiales de tu pedido especial ${pedido} hayan llegado en perfectas condiciones y que la remodelación de tus espacios vaya excelente.\n\n¿Nos regalas un minuto para conocer tu opinión sobre nuestro servicio y entrega?\n👉 ${url}\n\nGracias por elegir a Renova. ¡Renova es confianza en cada paso!`;
+      const ped = pedido ? ` especial ${pedido}` : "";
+      return `${saludo} te saludamos de Renova.\n\nEsperamos que los materiales de tu pedido${ped} hayan llegado en perfectas condiciones y que la remodelación de tus espacios vaya excelente.\n\n¿Nos regalas un minuto para conocer tu opinión sobre nuestro servicio y entrega?\n👉 ${url}\n\nGracias por elegir a Renova. ¡Renova es confianza en cada paso!`;
     },
   },
 ];
 
-export function BotonesCompartir({
+export function BotonCopiarFila({
   url,
-  numeroPedido,
-  referencia,
+  numeroPedido = "",
+  referencia = "",
 }: {
   url: string;
-  numeroPedido: string;
-  referencia: string;
+  numeroPedido?: string;
+  referencia?: string;
+}) {
+  const [copiado, setCopiado] = useState(false);
+  const mensaje = PLANTILLAS_WHATSAPP[0].generar(url, numeroPedido, referencia);
+
+  async function copiar() {
+    try {
+      await navigator.clipboard.writeText(mensaje);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch {
+      window.prompt("Copia el mensaje:", mensaje);
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <button
+        type="button"
+        onClick={copiar}
+        title="Copiar mensaje con liga"
+        className="rounded-lg border border-borde bg-white px-2.5 py-1 text-xs font-bold text-marca hover:bg-slate-50 transition cursor-pointer"
+      >
+        {copiado ? "✓ Copiado" : "📋 Copiar"}
+      </button>
+      <a
+        href={`https://wa.me/?text=${encodeURIComponent(mensaje)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Abrir WhatsApp"
+        className="rounded-lg bg-[#25D366] hover:bg-[#20bd5a] px-2.5 py-1 text-xs font-bold text-white transition"
+      >
+        WhatsApp
+      </a>
+    </div>
+  );
+}
+
+export function BotonesCompartir({
+  url,
+  numeroPedido = "",
+  referencia = "",
+}: {
+  url: string;
+  numeroPedido?: string;
+  referencia?: string;
 }) {
   const [plantillaSeleccionada, setPlantillaSeleccionada] = useState("general");
   const [copiado, setCopiado] = useState(false);
